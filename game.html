@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript">
+
+    // https://stackoverflow.com/questions/5448545/how-to-retrieve-get-parameters-from-javascript/
+    function findGetParameter(parameterName) {
+        var result = null,
+            tmp = [];
+        location.search
+            .substr(1)
+            .split("&")
+            .forEach(function (item) {
+            tmp = item.split("=");
+            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+            });
+        return result;
+    }
+
+    function place_barcode_random(barcode){
+        var new_angle = Math.random() * 360;
+        barcode.style.transformOrigin = "50% 50%";
+        barcode.style.transform = "rotate(" + new_angle + "deg)";
+
+        var min_x = 0;
+        var min_y = 0;
+        var max_x = window.innerWidth; // - barcode_width;
+        var max_y = window.innerHeight; // - barcode_height;
+        var new_barcode_x = min_x + Math.random() * (max_x - min_x); 
+        var new_barcode_y = min_y + Math.random() * (max_y - min_y);
+
+        barcode.style.position = "absolute";
+        barcode.style.left = new_barcode_x + 'px';
+        barcode.style.top = new_barcode_y + 'px';
+
+        barcode_box = barcode.getBoundingClientRect()
+        console.log("barcode is now at " + barcode.style.left + ", " +  barcode.style.top)
+        console.log(barcode_box)
+
+        if (barcode_box['top'] < min_y || barcode_box['bottom'] > max_y || barcode_box['left'] < min_x || barcode_box['right'] > max_x){
+            console.log("Positioned barcode out of canvas. Retrying.")
+            place_barcode_random(barcode);
+        }
+    }
+
+    function score_and_redirect(start_time, redirect_url){
+        var end_time = new Date();
+        var time_diff = end_time - start_time;
+        console.log("Elapsed time was: " + time_diff + " ms")
+        console.log("Redirecting to: " + redirect_url + "?time=" + time_diff)
+        window.location.replace(redirect_url + '?ms=' + time_diff)
+    }
+
+    function barcode_game() {        
+        /*scoreboard_url*/
+        var redirect_url = findGetParameter("redirect") || "index.html"
+
+        /* get rounds */
+        var rounds = parseInt(findGetParameter("rounds")) || 10;
+        console.log("Will play " + rounds + " rounds")
+
+        /* play game for number of rounds */
+        var start_time = new Date();
+        var barcode = document.getElementById("barcode_for_game");
+        place_barcode_random(barcode);
+
+        document.addEventListener('keydown', function(event){
+            if (event.key == "Enter") {
+                if (rounds > 1){
+                    rounds = rounds - 1;
+                    console.log(rounds + " rounds left!");
+                    place_barcode_random(barcode);
+                } else {
+                    console.log("Game done");
+                    score_and_redirect(start_time, redirect_url)
+                }
+            }
+        })
+
+    }
+    </script>
+</head>
+
+<body onload="barcode_game()">
+    <img id="barcode_for_game" src="scan_me.svg">
+</body>
+</html>

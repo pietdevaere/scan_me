@@ -9,27 +9,32 @@
     }
 
     function place_barcode_random(barcode){
-        var barcode_width = barcode.offsetWidth;
-        var barcode_height = barcode.offsetHeight;
-        console.log("barcode dimensions: " + barcode_width + "x" + barcode_height + "px");
+        var new_angle = Math.random() * 360;
+        barcode.style.transformOrigin = "50% 50%";
+        barcode.style.transform = "rotate(" + new_angle + "deg)";
 
         var min_x = 0;
         var min_y = 0;
-        var max_x = window.innerWidth - barcode_width;
-        var max_y = window.innerHeight - barcode_height;
-        console.log(max_y)
+        var max_x = window.innerWidth; // - barcode_width;
+        var max_y = window.innerHeight; // - barcode_height;
         var new_barcode_x = min_x + Math.random() * (max_x - min_x); 
         var new_barcode_y = min_y + Math.random() * (max_y - min_y);
 
         barcode.style.position = "absolute";
         barcode.style.left = new_barcode_x + 'px';
         barcode.style.top = new_barcode_y + 'px';
-        console.log("barcode is now at " + new_barcode_x + ", " + new_barcode_y)
+
+        barcode_box = barcode.getBoundingClientRect()
+        console.log("barcode is now at " + barcode.style.left + ", " +  barcode.style.top)
+        console.log(barcode_box)
+
+        if (barcode_box['top'] < min_y || barcode_box['bottom'] > max_y || barcode_box['left'] < min_x || barcode_box['right'] > max_x){
+            console.log("Positioned barcode out of canvas. Retrying.")
+            place_barcode_random(barcode);
+        }
     }
 
     function barcode_game() {
-        var barcode_string = "036000291452"
-
         var barcode = document.getElementById("barcode_for_game");
         place_barcode_random(barcode);
         document.addEventListener('keydown', function(event){
@@ -42,7 +47,7 @@
 </head>
 
 <body onload="barcode_game()">
-    <img id="barcode_for_game" src="test_barcode.svg">
+    <img id="barcode_for_game" src="scan_me.svg">
     <div id="test"></div>
 </body>
 </html>

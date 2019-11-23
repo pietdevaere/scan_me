@@ -28,8 +28,15 @@
     }
 
     function barcode_game() {
+        var barcode_string = "036000291452"
+
         var barcode = document.getElementById("barcode_for_game");
         place_barcode_random(barcode);
+        document.addEventListener('keydown', function(event){
+            if (event.key == "Enter") {
+                place_barcode_random(barcode);
+            }
+        })
     }
     </script>
 </head>

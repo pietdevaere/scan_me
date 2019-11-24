@@ -5,7 +5,7 @@
 
     <style>
         #barcode_for_game {
-            display: none
+            display: hidden
         }
     </style>
 
@@ -70,7 +70,7 @@
         /* play game for number of rounds */
         var barcode = document.getElementById("barcode_for_game");
         place_barcode_random(barcode);
-        barcode.style.display = "block";
+        barcode.style.visibility = "visible";
         var start_time = new Date();
 
         document.addEventListener('keydown', function(event){

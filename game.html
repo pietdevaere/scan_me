@@ -59,6 +59,28 @@
         window.location.replace(redirect_url + '?ms=' + time_diff)
     }
 
+    function is_accepted_char(key) {
+        return key.length == 1;
+        //return ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z'))
+    }
+
+    function BarcodeReader(callback) {
+        this.char_buffer = "";
+        this.callback = callback;
+
+        this.incomming_keystroke = function(event){
+            console.log("Input key: '" + event.key + "' Is accepted char: " + is_accepted_char(event.key))
+            if (event.key == "Enter") {
+                console.log("Calling BarcodeReader callback with string: " + this.char_buffer);
+                this.callback();
+                this.char_buffer = "";
+            } else if (is_accepted_char(event.key)) {
+                this.char_buffer += event.key;
+            }
+        }
+
+    }
+
     function barcode_game() {        
         /*scoreboard_url*/
         var redirect_url = findGetParameter("redirect") || "index.html"
@@ -73,18 +95,18 @@
         barcode.style.visibility = "visible";
         var start_time = new Date();
 
-        document.addEventListener('keydown', function(event){
-            if (event.key == "Enter") {
-                if (rounds > 1){
+        var barcode_reader = new BarcodeReader(function(){
+            if (rounds > 1){
                     rounds = rounds - 1;
                     console.log(rounds + " rounds left!");
                     place_barcode_random(barcode);
                 } else {
                     console.log("Game done");
-                    score_and_redirect(start_time, redirect_url)
+                    score_and_redirect(start_time, redirect_url);
                 }
-            }
         })
+
+        document.addEventListener('keydown', function(event){barcode_reader.incomming_keystroke(event)});
 
     }
     </script>

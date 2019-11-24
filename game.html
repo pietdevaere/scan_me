@@ -8,7 +8,7 @@
             visibility: hidden
         }
     </style>
-
+    <script src="JsBarcode.all.min.js"></script>
     <script type="text/javascript">
 
     // https://stackoverflow.com/questions/5448545/how-to-retrieve-get-parameters-from-javascript/
@@ -25,7 +25,9 @@
         return result;
     }
 
-    function place_barcode_random(barcode){
+    function place_barcode_random(barcode, barcode_content){
+        JsBarcode("#barcode_for_game", barcode_content, {width: 1.5, height: 20});
+
         var new_angle = Math.random() * 360;
         barcode.style.transformOrigin = "50% 50%";
         barcode.style.transform = "rotate(" + new_angle + "deg)";
@@ -72,7 +74,7 @@
             console.log("Input key: '" + event.key + "' Is accepted char: " + is_accepted_char(event.key))
             if (event.key == "Enter") {
                 console.log("Calling BarcodeReader callback with string: " + this.char_buffer);
-                this.callback();
+                this.callback(this.char_buffer);
                 this.char_buffer = "";
             } else if (is_accepted_char(event.key)) {
                 this.char_buffer += event.key;
@@ -81,7 +83,19 @@
 
     }
 
-    function barcode_game() {        
+    // https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+    function random_string(length) {
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for ( var i = 0; i < length; i++ ) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
+    function barcode_game() {
+        var next_round_barcode_string = random_string(7)      
         /*scoreboard_url*/
         var redirect_url = findGetParameter("redirect") || "index.html"
 
@@ -91,19 +105,22 @@
 
         /* play game for number of rounds */
         var barcode = document.getElementById("barcode_for_game");
-        place_barcode_random(barcode);
+        place_barcode_random(barcode, next_round_barcode_string);
         barcode.style.visibility = "visible";
         var start_time = new Date();
 
-        var barcode_reader = new BarcodeReader(function(){
-            if (rounds > 1){
+        var barcode_reader = new BarcodeReader(function(barcode_string){
+            if (barcode_string == next_round_barcode_string) {
+                if (rounds > 1){
                     rounds = rounds - 1;
                     console.log(rounds + " rounds left!");
-                    place_barcode_random(barcode);
+                    next_round_barcode_string = random_string(7)
+                    place_barcode_random(barcode, next_round_barcode_string);
                 } else {
                     console.log("Game done");
                     score_and_redirect(start_time, redirect_url);
-                }
+                    }
+            }
         })
 
         document.addEventListener('keydown', function(event){barcode_reader.incomming_keystroke(event)});
@@ -113,6 +130,6 @@
 </head>
 
 <body onload="barcode_game()">
-    <img id="barcode_for_game" width=150px src="scan_me.svg">
+    <svg id="barcode_for_game"></svg>
 </body>
 </html>

@@ -61,6 +61,8 @@ function barcode_reader(callback_function){
 function barcode_game(){
     var game_state = "init";
     var game_barcodes = [];
+    var game_barcode_height = 20;
+    var game_barcode_width = 1.5;
     var barcode_length = 7;
     var barcodes_per_game = 10;
     var max_scoreboard_size = 10;
@@ -189,7 +191,9 @@ function barcode_game(){
         // https://stackoverflow.com/questions/8215021/create-svg-tag-with-javascript
         var barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         barcode.className = "barcode";
-        barcode.setAttribute("jsbarcode-value", random_string())
+        barcode.setAttribute("jsbarcode-value", random_string());
+        barcode.setAttribute("jsbarcode-height", game_barcode_height);
+        barcode.setAttribute("jsbarcode-width", game_barcode_width);
         barcode.style.position = "fixed";
         barcode.style.visibility = "hidden";
         JsBarcode(barcode).init();
@@ -289,10 +293,11 @@ function barcode_game(){
         done_barcode.id = "name_entry_done_barcode";
         done_barcode.setAttribute("jsbarcode-value", "Done");
         done_barcode.style.display = 'block';
+        done_barcode.style.margin = "auto";
         JsBarcode(done_barcode).init();
         barcode_div.appendChild(done_barcode);
         
-        // Now generate the alphabeth
+        // Now generate the alphabet
         var index;
         var barcode;
         for (index = 0; index < alphabet.length; index++){
@@ -300,6 +305,7 @@ function barcode_game(){
             barcode.setAttribute("jsbarcode-value", alphabet[index]);
             barcode.setAttribute("jsbarcode-height", alphabet_barcode_height);
             barcode.style.display = 'block';
+            barcode.style.margin = "auto";
             JsBarcode(barcode).init();
             barcode_div.appendChild(barcode);
         }

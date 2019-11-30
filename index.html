@@ -6,7 +6,20 @@
     <style>
         body {
             text-align: center;
-            align: center;
+        }
+        .center {
+            margin: 0 auto;
+        }
+        table {
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            padding: 10px;
+        }
+        th {
+            padding: 10px;
+            padding: 10px;
         }
         .game_barcode {
             position: fixed;
@@ -20,7 +33,7 @@
         <h2>Scan barcode to start game</h2>
         <svg id="start_game_barcode" jsbarcode-value="scan_me"></svg>
         <h2>Top scores</h2>
-        <table>
+        <table class="center">
             <thead>
                 <tr>
                     <th>Player</th>

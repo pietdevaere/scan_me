@@ -65,6 +65,7 @@ function barcode_game(){
     var barcodes_per_game = 2;
     var max_scoreboard_size = 10;
     var start_time;
+    var max_user_name_length = 20;
 
     var reader = barcode_reader();
     reader.register_listener();
@@ -90,6 +91,7 @@ function barcode_game(){
         }
         scoreboard.splice(insertion_index, 0, {name: player, score: score});
         set_scoreboard(scoreboard.slice(0, max_scoreboard_size));
+        show_scoreboard(score);
     }
 
     var max_topscore = function(){
@@ -109,6 +111,7 @@ function barcode_game(){
 
     var show_scoreboard = function(score){
         remove_all_barcodes();
+        document.getElementById("name_entry").style.display = "none";
 
         var main_header = document.getElementById("main_header")
         if (score){
@@ -233,22 +236,74 @@ function barcode_game(){
     var process_score = function(score){
         if(score_qualifies_for_topscore(score)){
             console.log("new highscore!!");
-            add_to_scoreboard("piet", score);
+            ask_for_user_name(function(name){
+                add_to_scoreboard(name, score);
+            });
+        } else {
+            show_scoreboard(score);
         }
-        show_scoreboard(score);
+    }
+
+    var ask_for_user_name = function(callback){
+        console.log("Asking for the user's name");
+        remove_all_barcodes();
+        document.getElementById("scoreboard").style.display = "none";
+        document.getElementById("name_entry").style.display = "block";
+        reader.update_callback(function(){
+            var char_buffer = "";
+
+            return function(user_input){
+                console.log("DBD " + user_input);
+                //todo replace "done" with value obtained from DOM element
+                if (user_input == "Done"){
+                    var name = char_buffer.substring(0, max_user_name_length)
+                    console.log("Got user name, doing callback | " + name);
+                    callback(name)
+                }
+                else if (user_input.length == 1){
+                    char_buffer += user_input;
+                }
+            }
+        }())
     }
 
     var start_new_game = function(){
         document.getElementById("scoreboard").style.display = "none";
+        document.getElementById("name_entry").style.display = "none";
         game_barcodes = prepare_game_barcodes();
         start_time = new Date();
         step_gameplay(true);
     }
 
-
+    var generate_name_entry_barcodes = function(){
+        var alphabet_barcode_height = 20;
+        var barcode_div = document.getElementById("name_entry_barcodes");
+        var alphabet = "abcdefghijklmnopqrstuvwxyz";
+        
+        // First create the name entry done barcode
+        var done_barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        done_barcode.id = "name_entry_done_barcode";
+        done_barcode.setAttribute("jsbarcode-value", "Done");
+        done_barcode.style.display = 'block';
+        JsBarcode(done_barcode).init();
+        barcode_div.appendChild(done_barcode);
+        
+        // Now generate the alphabeth
+        var index;
+        var barcode;
+        for (index = 0; index < alphabet.length; index++){
+            barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            barcode.setAttribute("jsbarcode-value", alphabet[index]);
+            barcode.setAttribute("jsbarcode-height", alphabet_barcode_height);
+            barcode.style.display = 'block';
+            JsBarcode(barcode).init();
+            barcode_div.appendChild(barcode);
+        }
+    }
 
     return {
         init: function () {
+            generate_name_entry_barcodes();
             JsBarcode("#start_game_barcode").init();
             show_scoreboard();
             //start_new_game();
@@ -263,6 +318,6 @@ function init_barcode_game(){
     JsBarcode("#start_game_barcode").init()
 
     game = barcode_game();
-    //game.set_scores([{name: "piet", score: 1}, {name: "ladina", score: 2}])
+    game.set_scores([{name: "piet", score: 1}, {name: "ladina", score: 2}])
     game.init();
 }

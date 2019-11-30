@@ -12,9 +12,21 @@
 </head>
 <body onload="init_barcode_game()">
     <div id="scoreboard">
-        <h1>Welcome to SCAN_ME!</h1>
-        <h2>Scan barcode to start</h2>
+        <h1 id="main_header">Javascript not enabled :(</h1>
+        <h2>Scan barcode to start game</h2>
         <svg id="start_game_barcode" jsbarcode-value="scan_me"></svg>
+        <h2>Top scores</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="score-tbody">
+
+            </tbody>
+        </table>
     </div>
 </body>
 </html>

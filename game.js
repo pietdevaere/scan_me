@@ -1,3 +1,24 @@
+// https://stackoverflow.com/questions/19189785/is-there-a-good-cookie-library-for-javascript
+document.getCookie = function(sName) {
+    sName = sName.toLowerCase();
+    var oCrumbles = document.cookie.split(';');
+    for(var i=0; i<oCrumbles.length;i++) {
+        var oPair= oCrumbles[i].split('=');
+        var sKey = decodeURIComponent(oPair[0].trim().toLowerCase());
+        var sValue = oPair.length>1?oPair[1]:'';
+        if(sKey == sName)
+            return decodeURIComponent(sValue);
+    }
+    return '';
+}
+
+document.setCookie = function(sName,sValue) {
+    var oDate = new Date();
+    oDate.setYear(oDate.getFullYear() + 10);
+    var sCookie = encodeURIComponent(sName) + '=' + encodeURIComponent(sValue) + ';expires=' + oDate.toGMTString() + ';path=/';
+    document.cookie= sCookie;
+}
+
 function barcode_reader(callback_function){
     var char_buffer = "";
     var callback = callback_function || function(){};
@@ -41,11 +62,44 @@ function barcode_game(){
     var game_state = "init";
     var game_barcodes = [];
     var barcode_length = 7;
-    var barcodes_per_game = 10;
+    var barcodes_per_game = 2;
+    var max_scoreboard_size = 10;
     var start_time;
 
     var reader = barcode_reader();
     reader.register_listener();
+
+    var get_scoreboard = function(){
+        return JSON.parse(document.getCookie("scan_me-scoreboard"));
+    }
+
+    var set_scoreboard = function(scoreboard){
+        return document.setCookie("scan_me-scoreboard", JSON.stringify(scoreboard))
+    }
+
+    var add_to_scoreboard = function(player, score){
+        var insertion_index;
+        var scoreboard = get_scoreboard();
+
+        insertion_index = 0;
+        console.log(scoreboard);
+        console.log(typeof scoreboard[insertion_index]["score"]);
+        while (scoreboard[insertion_index]["score"] <= score && insertion_index <= scoreboard.length){
+            insertion_index++;
+            console.log("ping");
+        }
+        scoreboard.splice(insertion_index, 0, {name: player, score: score});
+        set_scoreboard(scoreboard.slice(0, max_scoreboard_size));
+    }
+
+    var max_topscore = function(){
+        var scoreboard = get_scoreboard()
+        return scoreboard[scoreboard.length -1]['score'];
+    }
+
+    var score_qualifies_for_topscore = function(score){
+        return score < max_topscore() || get_scoreboard().length < max_scoreboard_size;
+    }
 
     var remove_all_barcodes = function(){
         while (game_barcodes.length > 0){
@@ -55,6 +109,27 @@ function barcode_game(){
 
     var show_scoreboard = function(score){
         remove_all_barcodes();
+
+        var main_header = document.getElementById("main_header")
+        if (score){
+            main_header.innerHTML = "Your score is: " + score + "s!";
+        }
+        else{
+            main_header.innerHTML = "Welcome to SCAN_ME!";
+        }
+
+        var i;
+        var scoreboard = get_scoreboard();
+        score_tbody = document.createElement('tbody')
+        for(i = 0; i < scoreboard.length; i++){
+            var row = score_tbody.insertRow();
+            row.insertCell().innerHTML = scoreboard[i]['name'];
+            row.insertCell().innerHTML = scoreboard[i]['score'];
+        }
+        score_tbody.id = "score-tbody";
+        old_score_tbody = document.getElementById("score-tbody");
+        old_score_tbody.parentNode.replaceChild(score_tbody, old_score_tbody);
+
         document.getElementById("scoreboard").style.display = "block";
 
         reader.update_conditional_callback(
@@ -151,12 +226,16 @@ function barcode_game(){
             var end_time = new Date();
             var time_diff = end_time - start_time;
             console.log("Elapsed time was: " + time_diff + " ms")
-            process_score(time_diff);
+            process_score(time_diff / 1000);
         }
     }
 
     var process_score = function(score){
-        console.log("Huy Huy Huy! "+ score);
+        if(score_qualifies_for_topscore(score)){
+            console.log("new highscore!!");
+            add_to_scoreboard("piet", score);
+        }
+        show_scoreboard(score);
     }
 
     var start_new_game = function(){
@@ -172,9 +251,10 @@ function barcode_game(){
         init: function () {
             JsBarcode("#start_game_barcode").init();
             show_scoreboard();
-
             //start_new_game();
-        }
+        },
+        set_scores: set_scoreboard,
+        get_score: get_scoreboard
     }
 }
 
@@ -183,5 +263,6 @@ function init_barcode_game(){
     JsBarcode("#start_game_barcode").init()
 
     game = barcode_game();
+    game.set_scores([{name: "piet", score: 1}, {name: "ladina", score: 2}])
     game.init();
 }

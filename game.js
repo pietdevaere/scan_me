@@ -245,18 +245,19 @@ function barcode_game(){
             console.log("new highscore!!");
             ask_for_user_name(function(name){
                 add_to_scoreboard(name, score);
-            });
+            }, score);
         } else {
             show_scoreboard(score);
         }
     }
 
-    var ask_for_user_name = function(callback){
+    var ask_for_user_name = function(callback, score){
         console.log("Asking for the user's name");
         remove_all_barcodes();
         document.getElementById("scoreboard").style.display = "none";
         document.getElementById("name_entry").style.display = "block";
         document.getElementById("name_preview").innerHTML = "";
+        document.getElementById("new_highscore").innerHTML = score;
         reader.update_callback(function(){
             var char_buffer = "";
 

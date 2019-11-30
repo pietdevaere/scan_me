@@ -265,6 +265,7 @@ function barcode_game(){
                 }
                 else if (user_input.length == 1){
                     char_buffer += user_input;
+                    document.getElementById("name_preview").innerHTML = char_buffer;
                 }
             }
         }())
@@ -321,6 +322,6 @@ function init_barcode_game(){
     JsBarcode("#start_game_barcode").init()
 
     game = barcode_game();
-    game.set_scores([{name: "piet", score: 1}, {name: "ladina", score: 2}])
+    game.set_scores([{name: "Satoshi", score: 20}])
     game.init();
 }

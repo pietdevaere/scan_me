@@ -71,7 +71,11 @@ function barcode_game(){
     reader.register_listener();
 
     var get_scoreboard = function(){
-        return JSON.parse(document.getCookie("scan_me-scoreboard"));
+        var scoreboard_cookie = document.getCookie("scan_me-scoreboard");
+        if (scoreboard_cookie){
+            return JSON.parse(document.getCookie("scan_me-scoreboard"));
+        }
+        return [];
     }
 
     var set_scoreboard = function(scoreboard){

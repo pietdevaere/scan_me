@@ -1,57 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
+    <script src="JsBarcode.all.min.js"></script>
+    <script language="javascript" type="text/javascript" src="game.js"></script>
     <style>
-        body {
-            text-align: center;
-            margin:40px auto;
-            max-width:650px;
-            line-height:1.6;
-            font-size:18px;
-            color:#444;
-            padding:0 10px
+        .game_barcode {
+            position: fixed;
         }
-        h1,h2,h3 {
-            line-height:1.2
-            }
     </style>
     <meta charset="utf-8">
-    <script type="text/javascript">
-
-    // https://stackoverflow.com/questions/5448545/how-to-retrieve-get-parameters-from-javascript/
-    function findGetParameter(parameterName) {
-        var result = null,
-            tmp = [];
-        location.search
-            .substr(1)
-            .split("&")
-            .forEach(function (item) {
-            tmp = item.split("=");
-            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-            });
-        return result;
-    }
-
-    function scoreboard(){
-        var time_ms = parseInt(findGetParameter("ms"));
-        if (time_ms) {
-            document.getElementById("score_line").innerHTML = 
-                "Your score is: " + time_ms / 1000 + " s!";
-        }
-
-        document.addEventListener('keydown', function(event){
-            if (event.key == "Enter") {
-                window.location.replace("game.html");
-            }
-        });
-    }
-    </script>
 </head>
+<body onload="init_barcode_game()">
+    <div id="scoreboard">
+        <h1 id="main_header">Javascript not enabled :(</h1>
+        <h2>Scan barcode to start game</h2>
+        <svg id="start_game_barcode" jsbarcode-value="scan_me"></svg>
+        <h2>Top scores</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="score-tbody">
 
-<body onload="scoreboard()">
-    <h1 id="score_line">Welcome to SCAN_ME!</h1>
-    <h2>Scan barcode to start game</h2>
-    <img width=400px src="scan_me.svg">
+            </tbody>
+        </table>
+    </div>
+    <div id="name_entry">
+        <h1>Congratulations, you have a new high score!</h1>
+        <h1 id="new_highscore"></h1>
+        <h2>Enter name:</h2>
+        <div id="name_entry_barcodes">
+        </div>
+    </div>
 </body>
 </html>

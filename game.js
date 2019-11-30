@@ -256,6 +256,7 @@ function barcode_game(){
         remove_all_barcodes();
         document.getElementById("scoreboard").style.display = "none";
         document.getElementById("name_entry").style.display = "block";
+        document.getElementById("name_preview").innerHTML = "";
         reader.update_callback(function(){
             var char_buffer = "";
 

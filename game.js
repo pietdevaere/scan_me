@@ -104,7 +104,7 @@ function barcode_game(){
     }
 
     var score_qualifies_for_topscore = function(score){
-        return score < max_topscore() || get_scoreboard().length < max_scoreboard_size;
+        return get_scoreboard().length < max_scoreboard_size || score < max_topscore();
     }
 
     var remove_all_barcodes = function(){

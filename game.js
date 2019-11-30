@@ -88,7 +88,6 @@ function barcode_game(){
 
         insertion_index = 0;
         console.log(scoreboard);
-        console.log(typeof scoreboard[insertion_index]["score"]);
         while (insertion_index < scoreboard.length && scoreboard[insertion_index]["score"] <= score){
             insertion_index++;
             console.log("ping");

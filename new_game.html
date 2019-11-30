@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="JsBarcode.all.min.js"></script>
+    <script language="javascript" type="text/javascript" src="game.js"></script>
+    <style>
+        .game_barcode {
+            position: fixed;
+        }
+    </style>
+    <meta charset="utf-8">
+</head>
+<body onload="init_barcode_game()">
+    <div id="scoreboard">
+        <h1>Welcome to SCAN_ME!</h1>
+        <h2>Scan barcode to start</h2>
+        <svg id="start_game_barcode" jsbarcode-value="scan_me"></svg>
+    </div>
+</body>
+</html>

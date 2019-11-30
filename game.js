@@ -84,7 +84,7 @@ function barcode_game(){
         insertion_index = 0;
         console.log(scoreboard);
         console.log(typeof scoreboard[insertion_index]["score"]);
-        while (scoreboard[insertion_index]["score"] <= score && insertion_index <= scoreboard.length){
+        while (insertion_index < scoreboard.length && scoreboard[insertion_index]["score"] <= score){
             insertion_index++;
             console.log("ping");
         }
@@ -263,6 +263,6 @@ function init_barcode_game(){
     JsBarcode("#start_game_barcode").init()
 
     game = barcode_game();
-    game.set_scores([{name: "piet", score: 1}, {name: "ladina", score: 2}])
+    //game.set_scores([{name: "piet", score: 1}, {name: "ladina", score: 2}])
     game.init();
 }

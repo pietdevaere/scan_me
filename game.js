@@ -62,7 +62,7 @@ function barcode_game(){
     var game_state = "init";
     var game_barcodes = [];
     var barcode_length = 7;
-    var barcodes_per_game = 2;
+    var barcodes_per_game = 10;
     var max_scoreboard_size = 10;
     var start_time;
     var max_user_name_length = 20;

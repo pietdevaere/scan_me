@@ -19,6 +19,30 @@ document.setCookie = function(sName,sValue) {
     document.cookie= sCookie;
 }
 
+function inactivity_detector(timeout, callback_function){
+    var timeout = timeout || 60 * 1000;
+    var callback = callback_function || function(){};
+    var timeout_handler;
+
+    var incoming_keystroke = function(event){
+        if (event.key === 'Enter'){
+            if (timeout_handler) {
+                clearTimeout(timeout_handler);
+            }
+            timeout_handler = setTimeout(function(){
+                console.log("Inactivity detected, calling callback.");
+                callback();
+            }, timeout);
+        }
+    }
+
+    return {
+        register_listener: function(){
+            document.addEventListener('keydown', incoming_keystroke)
+        }
+    }
+}
+
 function barcode_reader(callback_function){
     var char_buffer = "";
     var callback = callback_function || function(){};
@@ -27,7 +51,7 @@ function barcode_reader(callback_function){
         return key.length === 1;
     }
 
-    var incomming_keystroke = function(event){
+    var incoming_keystroke = function(event){
         if (event.key === "Enter") {
             console.log("Calling BarcodeReader callback with string: " + char_buffer);
             callback(char_buffer);
@@ -56,7 +80,7 @@ function barcode_reader(callback_function){
             callback = function(){};
         },
         register_listener: function(){
-            document.addEventListener('keydown', incomming_keystroke)
+            document.addEventListener('keydown', incoming_keystroke)
         }
     }
 }
@@ -71,6 +95,7 @@ function barcode_game(){
     var max_scoreboard_size = 10;
     var start_time;
     var max_user_name_length = 10;
+    var inactivity_timeout = 60 * 1000;
 
     var reader = barcode_reader();
     reader.register_listener();
@@ -127,7 +152,7 @@ function barcode_game(){
 
         var main_header = document.getElementById("main_header")
         if (score){
-            main_header.innerHTML = "Your score is: " + score + "s!";
+            main_header.innerHTML = "Your score is: " + score + " s!";
         }
         else{
             main_header.innerHTML = "Welcome to SCAN_ME!";
@@ -423,6 +448,7 @@ function barcode_game(){
             generate_static_name_entry_barcodes();
             JsBarcode("#start_game_barcode").init();
             show_scoreboard();
+            inactivity_detector(inactivity_timeout, show_scoreboard).register_listener();
             //start_new_game();
         },
         clear_scores: clear_scoreboard

@@ -67,7 +67,7 @@ function barcode_game(){
     var barcodes_per_game = 2;
     var max_scoreboard_size = 10;
     var start_time;
-    var max_user_name_length = 20;
+    var max_user_name_length = 10;
 
     var reader = barcode_reader();
     reader.register_listener();
@@ -82,6 +82,10 @@ function barcode_game(){
 
     var set_scoreboard = function(scoreboard){
         return document.setCookie("scan_me-scoreboard", JSON.stringify(scoreboard))
+    }
+
+    var clear_scoreboard = function(){
+        set_scoreboard([{name: "satoshi", score: 100}]);
     }
 
     var add_to_scoreboard = function(player, score){
@@ -142,7 +146,7 @@ function barcode_game(){
 
         reader.update_conditional_callback(
             start_new_game,
-            document.getElementById("start_game_barcode").getAttribute("jsbarcode-value")
+            get_text_from_barcode_id("start_game_barcode")
         );
     }
 
@@ -264,6 +268,9 @@ function barcode_game(){
         document.getElementById("name_entry").style.display = "block";
         document.getElementById("name_preview").innerHTML = "";
         document.getElementById("new_highscore").innerHTML = score;
+
+        var fast_entry_names = generate_fast_name_entry_barcodes();
+
         reader.update_callback(function(){
             var char_buffer = "";
 
@@ -271,7 +278,7 @@ function barcode_game(){
                 console.log("DBD " + user_input);
                 //todo replace "done" with value obtained from DOM element
                 if (user_input === get_text_from_barcode_id("name_entry_done_barcode")){
-                    var name = char_buffer.substring(0, max_user_name_length)
+                    var name = char_buffer.slice(0, max_user_name_length);
                     name = name || default_name;
                     console.log("Got user name, doing callback | " + name);
                     callback(name)
@@ -283,6 +290,9 @@ function barcode_game(){
                 else if (user_input === get_text_from_barcode_id("name_entry_backspace_barcode")){
                     char_buffer = char_buffer.slice(0, char_buffer.length - 1);
                     document.getElementById("name_preview").innerHTML = char_buffer;
+                }
+                else if (fast_entry_names.includes(user_input)) {
+                    callback(user_input);
                 }
                 else if (user_input.length == 1){
                     char_buffer += user_input;
@@ -300,7 +310,52 @@ function barcode_game(){
         step_gameplay(true);
     }
 
-    var generate_name_entry_barcodes = function(){
+    var generate_fast_name_entry_barcodes = function(){
+        var fast_entry_barcode_height = 20;
+        var fast_entry_names = [];
+        var fast_entry_barcodes = [];
+        var fast_entry_barcode_div = document.getElementById("fast_entry_barcodes");
+        var scoreboard = get_scoreboard();
+
+        var index, candidate_name, barcode;
+        for (index = 0; index < scoreboard.length; index++){
+            var candidate_name = scoreboard[index]['name']
+            if (! fast_entry_names.includes(candidate_name)){
+                fast_entry_names.push(candidate_name);
+                barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                barcode.setAttribute("jsbarcode-value", candidate_name);
+                barcode.setAttribute("jsbarcode-height", fast_entry_barcode_height);
+                JsBarcode(barcode).init();
+                fast_entry_barcodes.push(barcode);
+            }
+        }
+
+        clear_columns(fast_entry_barcode_div);
+        place_barcodes_in_columns(fast_entry_barcode_div, fast_entry_barcodes);
+
+        return fast_entry_names;
+    }
+
+    var place_barcodes_in_columns = function(row_div, barcodes){
+        var index;
+        var columns = row_div.getElementsByClassName('barcode_column')
+        
+        for(index = 0; index < barcodes.length; index++){
+            columns[index % columns.length].appendChild(barcodes[index]);
+        }
+    }
+
+    var clear_columns = function(row_div){
+        var columns = row_div.getElementsByClassName('barcode_column');
+        var column;
+        for (column of columns){
+            while (column.firstChild) {
+                column.removeChild(column.firstChild);
+            }
+        }
+    }
+
+    var generate_static_name_entry_barcodes = function(){
         var alphabet_barcode_height = 20;
         var alphabet = "abcdefghijklmnopqrstuvwxyz";
 
@@ -308,26 +363,31 @@ function barcode_game(){
         var alphabet_barcode_div = document.getElementById("alphabet_barcodes");
         
         // First create the control barcodes
+        var control_barcodes = [];
         var barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        barcode.id = "name_entry_done_barcode";
-        barcode.setAttribute("jsbarcode-value", "Done");
-        JsBarcode(barcode).init();
-        control_barcode_div.getElementsByClassName('barcode_column')[1].appendChild(barcode);
 
         barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         barcode.id = "name_entry_skip_barcode";
         barcode.setAttribute("jsbarcode-value", "Skip");
         JsBarcode(barcode).init();
-        control_barcode_div.getElementsByClassName('barcode_column')[0].appendChild(barcode);
+        control_barcodes.push(barcode)
+
+        barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        barcode.id = "name_entry_done_barcode";
+        barcode.setAttribute("jsbarcode-value", "Done");
+        JsBarcode(barcode).init();
+        control_barcodes.push(barcode)
 
         barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         barcode.id = "name_entry_backspace_barcode";
         barcode.setAttribute("jsbarcode-value", "Backspace");
         JsBarcode(barcode).init();
-        control_barcode_div.getElementsByClassName('barcode_column')[2].appendChild(barcode);
+        control_barcodes.push(barcode)
 
-        
+        place_barcodes_in_columns(control_barcode_div, control_barcodes);
+
         // Now generate the alphabet
+        var alphabet_barcodes = [];
         var index;
         for (index = 0; index < alphabet.length; index++){
             barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -335,21 +395,19 @@ function barcode_game(){
             barcode.setAttribute("jsbarcode-height", alphabet_barcode_height);
             barcode.style.display = 'block';
             JsBarcode(barcode).init();
-            column = index % 3;
-            alphabet_barcode_div.getElementsByClassName('barcode_column')[index % 3]
-            .appendChild(barcode);
+            alphabet_barcodes.push(barcode)
         }
+        place_barcodes_in_columns(alphabet_barcode_div, alphabet_barcodes);
     }
 
     return {
         init: function () {
-            generate_name_entry_barcodes();
+            generate_static_name_entry_barcodes();
             JsBarcode("#start_game_barcode").init();
             show_scoreboard();
             //start_new_game();
         },
-        set_scores: set_scoreboard,
-        get_score: get_scoreboard
+        clear_scores: clear_scoreboard
     }
 }
 
@@ -358,6 +416,6 @@ function init_barcode_game(){
     JsBarcode("#start_game_barcode").init()
 
     game = barcode_game();
-    //game.set_scores([{name: "Satoshi", score: 20}])
+    //game.clear_scores()
     game.init();
 }

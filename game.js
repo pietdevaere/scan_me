@@ -42,13 +42,6 @@ function barcode_reader(callback_function){
         update_callback: function(new_callback){
             callback = new_callback;
         },
-        // update_conditional_callback: function(new_callback, condition){
-        //     callback = function(user_input){
-        //         if (user_input === condition){
-        //             new_callback(user_input);
-        //         } 
-        //     }
-        // },
         update_conditional_callback: function(callback_list){
             callback = function(user_input){
                 var callback_entry;
@@ -251,13 +244,16 @@ function barcode_game(){
                 current_barcode.remove();
             }
             next_barcode = game_barcodes[0];
-            reader.update_callback(function(input) {
-                //console.log("Got: " + input);
-                //console.log("Wanted: " + next_barcode.getAttribute("jsbarcode-value"));
-                if (input === next_barcode.getAttribute("jsbarcode-value")){
-                    step_gameplay(false);
+            reader.update_conditional_callback([
+                {
+                    condition: next_barcode.getAttribute("jsbarcode-value"),
+                    function: function(){step_gameplay(false)}
+                },
+                {
+                    condition: "abort_game",
+                    function: function(){show_scoreboard()}
                 }
-            });
+            ])
             next_barcode.style.visibility = "visible";
         } else {
             var end_time = new Date();
@@ -298,7 +294,6 @@ function barcode_game(){
             var char_buffer = "";
 
             return function(user_input){
-                console.log("DBD " + user_input);
                 //todo replace "done" with value obtained from DOM element
                 if (user_input === get_text_from_barcode_id("name_entry_done_barcode")){
                     var name = char_buffer.slice(0, max_user_name_length);
@@ -435,7 +430,7 @@ function barcode_game(){
 }
 
 function init_barcode_game(){
-    console.log("hi!");
+    console.log("Hi there, welcome to SCAN_ME!");
     JsBarcode("#start_game_barcode").init()
 
     game = barcode_game();

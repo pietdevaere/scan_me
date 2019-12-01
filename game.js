@@ -74,7 +74,7 @@ function barcode_game(){
     var game_barcode_height = 20;
     var game_barcode_width = 2;
     var barcode_length = 7;
-    var barcodes_per_game = 2;
+    var barcodes_per_game = 20;
     var max_scoreboard_size = 10;
     var start_time;
     var max_user_name_length = 10;
@@ -145,6 +145,7 @@ function barcode_game(){
         score_tbody = document.createElement('tbody')
         for(i = 0; i < scoreboard.length; i++){
             var row = score_tbody.insertRow();
+            row.insertCell().innerHTML = i + 1;
             row.insertCell().innerHTML = scoreboard[i]['name'];
             row.insertCell().innerHTML = scoreboard[i]['score'];
         }

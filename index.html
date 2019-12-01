@@ -13,16 +13,36 @@
         table {
             text-align: left;
         }
-        td {
-            padding: 10px;
-            padding: 10px;
-        }
-        th {
+        td, th {
             padding: 10px;
             padding: 10px;
         }
         .game_barcode {
             position: fixed;
+        }
+        #name_entry .barcode_column {
+            float: left;
+            width: 33.33%
+        }
+        #name_entry .barcode_row::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        #name_entry .barcode_row .barcode_column > * {
+            display: block;
+        }
+        #name_entry .barcode_row .barcode_column:nth-of-type(1) > * {
+            margin-left: 40px;
+            margin-right: auto;
+        }
+        #name_entry .barcode_row .barcode_column:nth-of-type(2) > * {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #name_entry .barcode_row .barcode_column:nth-of-type(3) > * {
+            margin-left: auto;
+            margin-right: 40px;
         }
     </style>
     <meta charset="utf-8">
@@ -48,7 +68,16 @@
     <div id="name_entry">
         <h1>Congratulations, you have a new high score: <span id="new_highscore"> </span> s!</h1>
         <h2>Enter name: <span id=name_preview></span></h2>
-        <div id="name_entry_barcodes">
+        <div id="control_barcodes" class="barcode_row">
+                <div class='barcode_column'></div>
+                <div class='barcode_column'></div>
+                <div class='barcode_column'></div>
+        </div>
+        <h2>New Entry</h2> 
+        <div id="alphabet_barcodes" class="barcode_row">
+            <div class='barcode_column'></div>
+            <div class='barcode_column'></div>
+            <div class='barcode_column'></div>
         </div>
     </div>
 </body>

@@ -64,7 +64,7 @@ function barcode_game(){
     var game_barcode_height = 20;
     var game_barcode_width = 2;
     var barcode_length = 7;
-    var barcodes_per_game = 10;
+    var barcodes_per_game = 2;
     var max_scoreboard_size = 10;
     var start_time;
     var max_user_name_length = 20;
@@ -287,29 +287,56 @@ function barcode_game(){
 
     var generate_name_entry_barcodes = function(){
         var alphabet_barcode_height = 20;
-        var barcode_div = document.getElementById("name_entry_barcodes");
         var alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+        var control_barcode_div = document.getElementById("control_barcodes");
+        var alphabet_barcode_div = document.getElementById("alphabet_barcodes");
         
-        // First create the name entry done barcode
-        var done_barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        done_barcode.id = "name_entry_done_barcode";
-        done_barcode.setAttribute("jsbarcode-value", "Done");
-        done_barcode.style.display = 'block';
-        done_barcode.style.margin = "auto";
-        JsBarcode(done_barcode).init();
-        barcode_div.appendChild(done_barcode);
+        // First create the control barcodes
+        var barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        barcode.id = "name_entry_done_barcode";
+        barcode.setAttribute("jsbarcode-value", "Done");
+        JsBarcode(barcode).init();
+        control_barcode_div.getElementsByClassName('barcode_column')[1].appendChild(barcode);
+
+        barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        barcode.id = "name_entry_skip_barcode";
+        barcode.setAttribute("jsbarcode-value", "Skip");
+        JsBarcode(barcode).init();
+        control_barcode_div.getElementsByClassName('barcode_column')[0].appendChild(barcode);
+
+        barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        barcode.id = "name_entry_backspace_barcode";
+        barcode.setAttribute("jsbarcode-value", "Backspace");
+        JsBarcode(barcode).init();
+        control_barcode_div.getElementsByClassName('barcode_column')[2].appendChild(barcode);
+
         
         // Now generate the alphabet
         var index;
-        var barcode;
         for (index = 0; index < alphabet.length; index++){
             barcode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             barcode.setAttribute("jsbarcode-value", alphabet[index]);
             barcode.setAttribute("jsbarcode-height", alphabet_barcode_height);
             barcode.style.display = 'block';
-            barcode.style.margin = "auto";
             JsBarcode(barcode).init();
-            barcode_div.appendChild(barcode);
+            column = index % 3;
+            // switch(column) {
+            //     case 0:
+            //         barcode.style.marginLeft = "40px";
+            //         barcode.style.marginRight = "auto";
+            //         break;
+            //     case 1:
+            //         barcode.style.marginLeft = "auto";
+            //         barcode.style.marginRight = "auto";
+            //         break;
+            //     case 2:
+            //         barcode.style.marginLeft = "auto";
+            //         barcode.style.marginRight = "40px";
+            //         break;
+            // }
+            alphabet_barcode_div.getElementsByClassName('barcode_column')[index % 3]
+            .appendChild(barcode);
         }
     }
 

@@ -145,8 +145,10 @@ function barcode_game(){
         score_tbody = document.createElement('tbody')
         for(i = 0; i < scoreboard.length; i++){
             var row = score_tbody.insertRow();
+            var name = scoreboard[i]['name'];
+            var capitalized_name = name[0].toUpperCase() + name.slice(1).toLowerCase(); 
             row.insertCell().innerHTML = i + 1;
-            row.insertCell().innerHTML = scoreboard[i]['name'];
+            row.insertCell().innerHTML = capitalized_name;
             row.insertCell().innerHTML = scoreboard[i]['score'];
         }
         score_tbody.id = "score-tbody";

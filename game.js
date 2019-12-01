@@ -251,7 +251,13 @@ function barcode_game(){
         }
     }
 
+    var get_text_from_barcode_id = function(barcode_id){
+        barcode_element = document.getElementById(barcode_id);
+        return barcode_element.getAttribute("jsbarcode-value");
+    }
+
     var ask_for_user_name = function(callback, score){
+        var default_name = "satoshi";
         console.log("Asking for the user's name");
         remove_all_barcodes();
         document.getElementById("scoreboard").style.display = "none";
@@ -264,10 +270,19 @@ function barcode_game(){
             return function(user_input){
                 console.log("DBD " + user_input);
                 //todo replace "done" with value obtained from DOM element
-                if (user_input == "Done"){
+                if (user_input === get_text_from_barcode_id("name_entry_done_barcode")){
                     var name = char_buffer.substring(0, max_user_name_length)
+                    name = name || default_name;
                     console.log("Got user name, doing callback | " + name);
                     callback(name)
+                }
+                if (user_input === get_text_from_barcode_id("name_entry_skip_barcode")){
+                    console.log("Skipping user name entry");
+                    callback(default_name);
+                }
+                else if (user_input === get_text_from_barcode_id("name_entry_backspace_barcode")){
+                    char_buffer = char_buffer.slice(0, char_buffer.length - 1);
+                    document.getElementById("name_preview").innerHTML = char_buffer;
                 }
                 else if (user_input.length == 1){
                     char_buffer += user_input;
@@ -321,20 +336,6 @@ function barcode_game(){
             barcode.style.display = 'block';
             JsBarcode(barcode).init();
             column = index % 3;
-            // switch(column) {
-            //     case 0:
-            //         barcode.style.marginLeft = "40px";
-            //         barcode.style.marginRight = "auto";
-            //         break;
-            //     case 1:
-            //         barcode.style.marginLeft = "auto";
-            //         barcode.style.marginRight = "auto";
-            //         break;
-            //     case 2:
-            //         barcode.style.marginLeft = "auto";
-            //         barcode.style.marginRight = "40px";
-            //         break;
-            // }
             alphabet_barcode_div.getElementsByClassName('barcode_column')[index % 3]
             .appendChild(barcode);
         }

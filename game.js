@@ -72,7 +72,7 @@ function barcode_game(){
     var game_state = "init";
     var game_barcodes = [];
     var game_barcode_height = 20;
-    var game_barcode_width = 2;
+    var game_barcode_width = 1;
     var barcode_length = 7;
     var barcodes_per_game = 20;
     var max_scoreboard_size = 10;

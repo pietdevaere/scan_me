@@ -42,11 +42,21 @@ function barcode_reader(callback_function){
         update_callback: function(new_callback){
             callback = new_callback;
         },
-        update_conditional_callback: function(new_callback, condition){
+        // update_conditional_callback: function(new_callback, condition){
+        //     callback = function(user_input){
+        //         if (user_input === condition){
+        //             new_callback(user_input);
+        //         } 
+        //     }
+        // },
+        update_conditional_callback: function(callback_list){
             callback = function(user_input){
-                if (user_input === condition){
-                    new_callback(user_input);
-                } 
+                var callback_entry;
+                for (callback_entry of callback_list){
+                    if (user_input == callback_entry['condition']){
+                        callback_entry['function'](user_input);
+                    }
+                }
             }
         },
         clear_callback: function(){
@@ -144,10 +154,20 @@ function barcode_game(){
 
         document.getElementById("scoreboard").style.display = "block";
 
-        reader.update_conditional_callback(
-            start_new_game,
-            get_text_from_barcode_id("start_game_barcode")
-        );
+        reader.update_conditional_callback([
+            {
+                condition: get_text_from_barcode_id("start_game_barcode"),
+                function: start_new_game
+            },
+            {
+                condition: "reset_scores",
+                function: clear_scoreboard
+            },
+            {
+                condition: "reload_page",
+                function: function(){location.reload(true);}
+            }
+        ]);
     }
 
     var random_string = function(length){

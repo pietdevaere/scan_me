@@ -181,7 +181,7 @@ function barcode_game(){
                 function: start_new_game
             },
             {
-                condition: "reset_scores",
+                condition: "reset_score",
                 function: clear_scoreboard
             },
             {
